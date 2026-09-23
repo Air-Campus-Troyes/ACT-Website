@@ -92,10 +92,10 @@ GitHub does not delete it from the Worker (use `wrangler secret delete` for that
 
 | Variable                    | Value while on workers.dev                                                            |
 | --------------------------- | ------------------------------------------------------------------------------------- |
-| `CANONICAL_URL`             | `https://website.<subdomain>.workers.dev`                                         |
+| `CANONICAL_URL`             | `https://website.<subdomain>.workers.dev`                                             |
 | `ALLOW_INDEXING`            | `false` (keeps the workers.dev copy out of Google while the old site owns the domain) |
-| `PRODUCTION_URL`            | `https://website.<subdomain>.workers.dev`                                         |
-| `STAGING_URL`               | `https://website-staging.<subdomain>.workers.dev`                                 |
+| `PRODUCTION_URL`            | `https://website.<subdomain>.workers.dev`                                             |
+| `STAGING_URL`               | `https://website-staging.<subdomain>.workers.dev`                                     |
 | `PUBLIC_TURNSTILE_SITE_KEY` | production widget's site key                                                          |
 
 **Branch protection on `main`**: require a pull request, require the status check
