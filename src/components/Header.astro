@@ -1,6 +1,7 @@
 ---
 import { Image } from 'astro:assets';
 import Icon from '~/components/icons/Icon.astro';
+import PhoneLink from '~/components/PhoneLink.astro';
 import logo from '~/assets/brand/logo.png';
 import type { Site } from '~/lib/site';
 
@@ -44,20 +45,7 @@ const isActive = (href?: string) =>
         decoding="async"
       />
     </a>
-    <a
-      href={`tel:${site.phone}`}
-      class="font-display flex items-center gap-3 justify-self-end text-xl lg:text-2xl"
-      style="font-stretch: 75%"
-    >
-      <span class="grid size-10 place-items-center rounded-full bg-gold text-cream">
-        <Icon name="phone" class="size-6" />
-      </span>
-      <span class="hidden underline-offset-4 sm:inline">
-        {`${site.phoneDisplay.slice(0, 3)} `}
-        <span class="underline">{site.phoneDisplay.slice(4)}</span>
-      </span>
-      <span class="sr-only sm:hidden">Appeler le {site.phoneDisplay}</span>
-    </a>
+    <PhoneLink site={site} compact class="justify-self-end" />
   </div>
 
   <nav id="menu-principal" aria-label="Menu principal" class="hidden bg-gold lg:block" data-menu>

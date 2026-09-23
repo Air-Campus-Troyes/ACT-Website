@@ -11,9 +11,8 @@ sections:
       - type: contactForm
         title: Envoyez-nous un message
     right:
-      - type: card
+      - type: phone
         title: Appelez-nous
-        body: '[+33 6 13 71 20 11](tel:+33613712011)'
       - type: card
         title: Trouvez-nous
         body: |

@@ -20,6 +20,11 @@ const cols = {
 const [l, r] = ratio.split('-').map(Number);
 const sizes = (n: number) =>
   `(min-width: 1152px) ${Math.round((1100 * n) / (l + r))}px, (min-width: 1024px) ${Math.round((100 * n) / (l + r))}vw, 100vw`;
+
+// Both columns end at the same height (as in the design). The extra height of the shorter
+// column goes to its photos; a column without photos lets its last card stretch instead.
+const grows = (items: PageItem[], i: number) =>
+  items[i]!.type === 'image' || (i === items.length - 1 && !items.some((x) => x.type === 'image'));
 ---
 
 <div class:list={['grid grid-cols-1 gap-8 lg:gap-12', cols]}>
@@ -28,8 +33,10 @@ const sizes = (n: number) =>
     { items: right, n: r },
   ].map((col) => (
     <div class="flex flex-col gap-8 lg:gap-12">
-      {col.items.map((item) => (
-        <Item item={item} site={site} sizes={sizes(col.n)} />
+      {col.items.map((item, i) => (
+        <div class:list={['grid', grows(col.items, i) ? 'flex-auto' : 'flex-none']}>
+          <Item item={item} site={site} sizes={sizes(col.n)} />
+        </div>
       ))}
     </div>
   ))}

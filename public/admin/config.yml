@@ -80,6 +80,21 @@ x-items: &items
           default: center
           options: [{ label: Centré, value: center }, { label: À gauche, value: left }]
         - *buttons
+        - label: Parties supplémentaires (dans la même carte)
+          name: parts
+          widget: list
+          required: false
+          summary: '{{fields.title}}'
+          fields:
+            - { label: Titre, name: title, widget: string, required: false }
+            - {
+                label: Texte,
+                name: body,
+                widget: markdown,
+                required: false,
+                buttons: [bold, italic, link, bulleted-list, numbered-list],
+              }
+            - *buttons
     - label: Photo
       name: image
       fields:
@@ -99,6 +114,9 @@ x-items: &items
     - label: Formulaire de contact
       name: contactForm
       fields: [{ label: Titre, name: title, widget: string, default: Envoyez-nous un message }]
+    - label: Téléphone du club
+      name: phone
+      fields: [{ label: Titre, name: title, widget: string, default: Appelez-nous }]
     - label: Carte (plan)
       name: map
       fields: [{ label: Titre (lecteurs d’écran), name: title, widget: string, default: Carte }]

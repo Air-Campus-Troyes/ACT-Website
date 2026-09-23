@@ -2,31 +2,42 @@
 import Button from '~/components/Button.astro';
 import { renderMarkdown } from '~/lib/markdown';
 
-interface Props {
+type Buttons = { label: string; href: string; variant: 'gold' | 'navy' | 'light' }[];
+interface Part {
   title?: string;
   body?: string;
-  align?: 'center' | 'left';
-  buttons?: { label: string; href: string; variant: 'gold' | 'navy' | 'light' }[];
+  buttons?: Buttons;
 }
-const { title, body, align = 'center', buttons = [] } = Astro.props;
-const html = renderMarkdown(body);
+interface Props extends Part {
+  align?: 'center' | 'left';
+  /** Further title / text / buttons groups stacked in the same card. */
+  parts?: Part[];
+}
+const { title, body, buttons = [], align = 'center', parts = [] } = Astro.props;
+const groups = [{ title, body, buttons }, ...parts].map((p) => ({
+  ...p,
+  html: renderMarkdown(p.body),
+  buttons: p.buttons ?? [],
+}));
 ---
 
-<div
-  class:list={['card flex h-full flex-col justify-center gap-4', align === 'left' && 'text-left']}
->
-  {title && <h2 class="text-2xl sm:text-3xl">{title}</h2>}
-  {html && (
-    <div class:list={['richtext', align === 'center' && 'richtext-center']} set:html={html} />
-  )}
-  <slot />
-  {buttons.length > 0 && (
-    <div class:list={['mt-2 flex flex-wrap gap-4', align === 'center' && 'justify-center']}>
-      {buttons.map((b) => (
-        <Button href={b.href} variant={b.variant}>
-          {b.label}
-        </Button>
-      ))}
-    </div>
-  )}
+<div class:list={['card flex flex-col justify-center gap-4', align === 'left' && 'text-left']}>
+  {groups.map((g, i) => (
+    <>
+      {g.title && <h2 class:list={['text-2xl sm:text-3xl', i > 0 && 'mt-4']}>{g.title}</h2>}
+      {g.html && (
+        <div class:list={['richtext', align === 'center' && 'richtext-center']} set:html={g.html} />
+      )}
+      {i === 0 && <slot />}
+      {g.buttons.length > 0 && (
+        <div class:list={['mt-2 flex flex-wrap gap-4', align === 'center' && 'justify-center']}>
+          {g.buttons.map((b) => (
+            <Button href={b.href} variant={b.variant}>
+              {b.label}
+            </Button>
+          ))}
+        </div>
+      )}
+    </>
+  ))}
 </div>

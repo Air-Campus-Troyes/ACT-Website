@@ -1,0 +1,31 @@
+---
+import Icon from '~/components/icons/Icon.astro';
+import type { Site } from '~/lib/site';
+
+interface Props {
+  site: Site;
+  /** Header on small screens: icon only (the number stays available to screen readers). */
+  compact?: boolean;
+  class?: string;
+}
+const { site, compact = false, class: className } = Astro.props;
+// "+33 6 13 71 20 11" → country code, then the underlined national number (as in the design).
+const [prefix, ...rest] = site.phoneDisplay.split(' ');
+---
+
+<a
+  href={`tel:${site.phone}`}
+  class:list={[
+    'font-display flex items-center gap-3 text-xl [font-stretch:75%] lg:text-2xl',
+    className,
+  ]}
+>
+  <span class="grid size-10 shrink-0 place-items-center rounded-full bg-gold text-cream">
+    <Icon name="phone" class="size-6" />
+  </span>
+  <span class:list={['underline-offset-4', compact && 'hidden sm:inline']}>
+    {`${prefix} `}
+    <span class="underline">{rest.join(' ')}</span>
+  </span>
+  {compact && <span class="sr-only sm:hidden">Appeler le {site.phoneDisplay}</span>}
+</a>

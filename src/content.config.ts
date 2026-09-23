@@ -41,6 +41,16 @@ const pages = defineCollection({
         body: z.string().default(''),
         align: z.enum(['center', 'left']).default('center'),
         buttons: z.array(button).default([]),
+        // Extra title / text / buttons groups stacked in the same card.
+        parts: z
+          .array(
+            z.object({
+              title: z.string().optional(),
+              body: z.string().default(''),
+              buttons: z.array(button).default([]),
+            }),
+          )
+          .default([]),
       }),
       z.object({
         type: z.literal('image'),
@@ -53,6 +63,8 @@ const pages = defineCollection({
         title: z.string().default('Envoyez-nous un message'),
       }),
       z.object({ type: z.literal('map'), title: z.string().default('Carte') }),
+      // Club phone number from settings/site.yaml, styled like the header.
+      z.object({ type: z.literal('phone'), title: z.string().default('Appelez-nous') }),
       z.object({
         type: z.literal('document'),
         title: z.string(),

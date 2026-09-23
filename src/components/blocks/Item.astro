@@ -5,6 +5,7 @@ import Weather from './Weather.astro';
 import ContactForm from './ContactForm.astro';
 import MapEmbed from './MapEmbed.astro';
 import DocumentCard from './DocumentCard.astro';
+import PhoneLink from '~/components/PhoneLink.astro';
 import type { PageItem } from '~/lib/types';
 import type { Site } from '~/lib/site';
 
@@ -22,3 +23,8 @@ const { item, site, sizes } = Astro.props;
 {item.type === 'contactForm' && <ContactForm title={item.title} />}
 {item.type === 'map' && <MapEmbed title={item.title} site={site} />}
 {item.type === 'document' && <DocumentCard {...item} />}
+{item.type === 'phone' && (
+  <Card title={item.title}>
+    <PhoneLink site={site} class="mt-2 self-center text-navy" />
+  </Card>
+)}

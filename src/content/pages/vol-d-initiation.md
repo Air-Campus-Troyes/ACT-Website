@@ -54,13 +54,13 @@ sections:
           - label: Nos tarifs
             href: /nos-tarifs/
             variant: gold
-      - type: card
-        title: Envie de devenir élève pilote ?
-        body: Vous voulez apprendre à voler chez nous ? Venez vous renseigner sur les modalités dans notre rubrique.
-        buttons:
-          - label: Apprendre à piloter
-            href: /apprendre-a-piloter/
-            variant: gold
+        parts:
+          - title: Envie de devenir élève pilote ?
+            body: Vous voulez apprendre à voler chez nous ? Venez vous renseigner sur les modalités dans notre rubrique.
+            buttons:
+              - label: Apprendre à piloter
+                href: /apprendre-a-piloter/
+                variant: gold
       - type: image
         image:
           src: ../../assets/uploads/dune-du-pilat.jpg
