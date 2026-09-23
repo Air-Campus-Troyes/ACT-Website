@@ -7,6 +7,8 @@ accept = ["200..=299", "403", "429"]
 # string ("full"…), not a boolean.
 
 exclude = [
+  # Server routes (contact form action, CMS OAuth): handled by the Worker, not static files.
+  "/api/",
   # Government / CDN sites that block automated clients (return 503/403 to bots).
   "^https://www\\.ecologie\\.gouv\\.fr",
   # Map / navigation deep links and embeds.
