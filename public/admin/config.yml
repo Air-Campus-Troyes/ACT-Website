@@ -221,11 +221,26 @@ collections:
             name: full
             fields:
               - { <<: *items, label: Éléments, name: items }
-          - { label: Grille tarifaire, name: pricing, fields: [] }
-          - { label: Liste des avions, name: aircraft, fields: [] }
-          - { label: Foire aux questions, name: faq, fields: [] }
-          - { label: Plan du site, name: sitemap, fields: [] }
-          - { label: Texte libre (corps de la page), name: markdown, fields: [] }
+          - label: Grille tarifaire
+            name: pricing
+            # Decap needs at least one field per type: this one just repeats the type.
+            fields: [{ label: Type, name: type, widget: hidden, default: pricing }]
+          - label: Liste des avions
+            name: aircraft
+            # Decap needs at least one field per type: this one just repeats the type.
+            fields: [{ label: Type, name: type, widget: hidden, default: aircraft }]
+          - label: Foire aux questions
+            name: faq
+            # Decap needs at least one field per type: this one just repeats the type.
+            fields: [{ label: Type, name: type, widget: hidden, default: faq }]
+          - label: Plan du site
+            name: sitemap
+            # Decap needs at least one field per type: this one just repeats the type.
+            fields: [{ label: Type, name: type, widget: hidden, default: sitemap }]
+          - label: Texte libre (corps de la page)
+            name: markdown
+            # Decap needs at least one field per type: this one just repeats the type.
+            fields: [{ label: Type, name: type, widget: hidden, default: markdown }]
       - label: Texte libre
         name: body
         widget: markdown
