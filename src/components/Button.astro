@@ -1,0 +1,26 @@
+---
+interface Props {
+  href: string;
+  variant?: 'gold' | 'navy' | 'light';
+  class?: string;
+}
+const { href, variant = 'gold', class: className = '' } = Astro.props;
+const styles = {
+  gold: 'bg-gold text-navy hover:bg-gold-600',
+  navy: 'bg-navy text-cream hover:bg-navy-700',
+  light: 'bg-cream text-navy hover:bg-cream-200',
+};
+const external = /^https?:\/\//.test(href);
+---
+
+<a
+  href={href}
+  class:list={[
+    'font-display inline-flex min-h-11 min-w-48 items-center justify-center rounded-(--radius-button) px-6 py-2 text-lg tracking-wide uppercase transition-colors',
+    styles[variant],
+    className,
+  ]}
+  {...(external ? { rel: 'noopener', target: '_blank' } : {})}
+>
+  <slot />
+</a>

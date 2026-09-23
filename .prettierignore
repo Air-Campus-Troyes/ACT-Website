@@ -1,0 +1,11 @@
+dist
+.astro
+.wrangler
+node_modules
+package-lock.json
+design
+public/admin/index.html
+# Content is written by Decap CMS; its formatting is not ours to enforce.
+src/content
+playwright-report
+test-results

@@ -1,0 +1,65 @@
+---
+import { getEntry } from 'astro:content';
+import Card from './Card.astro';
+
+const pricing = (await getEntry('pricing', 'pricing'))!.data;
+---
+
+<div class="flex flex-col gap-12">
+  <Card title={pricing.intro.title} body={pricing.intro.body} align="left" />
+
+  <section
+    class="overflow-hidden rounded-(--radius-card) bg-cream text-navy"
+    aria-labelledby="grille-tarifaire"
+  >
+    <h2 id="grille-tarifaire" class="bg-gold px-6 py-6 text-center text-2xl sm:text-3xl">
+      {pricing.tableTitle}
+    </h2>
+    {pricing.tables.map((table) => (
+      <div class="overflow-x-auto">
+        <table class="w-full min-w-[32rem] border-collapse text-sm sm:text-base">
+          <caption
+            class="font-display border-b border-navy/30 px-6 py-8 text-center text-2xl uppercase"
+            style="font-stretch: 75%"
+          >
+            {table.title}
+          </caption>
+          {table.columns.length > 0 && (
+            <thead>
+              <tr class="border-b border-navy/30">
+                {table.columns.map((c, i) => (
+                  <th
+                    scope="col"
+                    class:list={[
+                      'px-6 py-5 font-bold',
+                      i === 0 ? 'text-left sm:pl-[15%]' : 'text-center',
+                    ]}
+                  >
+                    {c}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+          )}
+          <tbody>
+            {table.rows.map((row) => (
+              <tr class="border-b border-navy/30 last:border-b-0">
+                <th
+                  scope="row"
+                  class="px-6 py-5 text-left font-normal whitespace-nowrap sm:pl-[15%]"
+                >
+                  {row.label}
+                </th>
+                {row.values.map((v) => (
+                  <td class="px-6 py-5 text-center whitespace-nowrap">{v}</td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    ))}
+  </section>
+
+  {pricing.legend && <Card title={pricing.legend.title} body={pricing.legend.body} />}
+</div>

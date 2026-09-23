@@ -1,0 +1,59 @@
+---
+import { Image } from 'astro:assets';
+import Icon from '~/components/icons/Icon.astro';
+import logo from '~/assets/brand/logo.png';
+import type { Site } from '~/lib/site';
+
+interface Props {
+  site: Site;
+}
+const { site } = Astro.props;
+const networkLabel = { facebook: 'Facebook', instagram: 'Instagram', youtube: 'YouTube' } as const;
+---
+
+<footer class="font-display bg-cream text-navy uppercase" style="font-stretch: 75%">
+  <div class="container-page flex flex-col items-center gap-8 py-10 md:flex-row md:justify-between md:gap-4">
+    <a href="/" aria-label={`${site.name} – accueil`}>
+      <Image src={logo} alt="" width={150} height={103} class="h-24 w-auto" />
+    </a>
+    <ul class="flex items-center gap-8" aria-label="Réseaux sociaux">
+      {site.social.map((s) => (
+        <li>
+          <a
+            href={s.url}
+            rel="noopener me"
+            target="_blank"
+            class="grid size-11 place-items-center rounded-lg bg-gold text-cream hover:bg-gold-600"
+          >
+            <Icon name={s.network} class="size-7" />
+            <span class="sr-only">{`${site.name} sur ${networkLabel[s.network]}`}</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+    <nav aria-label="Liens rapides">
+      <ul class="flex flex-wrap justify-center gap-x-10 gap-y-3 text-lg">
+        {site.footerLinks.map((l) => (
+          <li>
+            <a href={l.href} class="hover:underline">
+              {l.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  </div>
+  <div class="bg-gold py-4 text-navy normal-case">
+    <nav aria-label="Informations légales">
+      <ul class="container-page flex flex-wrap justify-center gap-x-10 gap-y-2 text-sm">
+        {site.legalLinks.map((l) => (
+          <li>
+            <a href={l.href} class="hover:underline">
+              {l.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  </div>
+</footer>

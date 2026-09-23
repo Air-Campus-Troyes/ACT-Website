@@ -1,0 +1,3 @@
+# Redirects for old file URLs, which Astro's `redirects` config would give a trailing slash.
+# Page redirects live in src/config/redirects.mjs and are appended to this file at build time.
+/wp-content/uploads/2015/02/guide_instructeur_VFR_nuit.pdf /apprendre-a-piloter/vol-nuit/ 301

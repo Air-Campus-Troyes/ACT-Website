@@ -1,0 +1,23 @@
+---
+import { render } from 'astro:content';
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  entries: CollectionEntry<'faq'>[];
+}
+const { entries } = Astro.props;
+const rendered = await Promise.all(entries.map(async (e) => ({ e, ...(await render(e)) })));
+---
+
+<div class="gap-8 md:columns-2 lg:gap-12">
+  {rendered.map(({ e, Content }) => (
+    <section class="card mb-8 break-inside-avoid lg:mb-12" id={e.id} aria-labelledby={`q-${e.id}`}>
+      <h2 id={`q-${e.id}`} class="text-2xl sm:text-3xl">
+        {e.data.question}
+      </h2>
+      <div class="richtext mt-4">
+        <Content />
+      </div>
+    </section>
+  ))}
+</div>

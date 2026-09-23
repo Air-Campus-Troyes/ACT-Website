@@ -1,0 +1,24 @@
+---
+import Card from './Card.astro';
+import MediaImage from './MediaImage.astro';
+import Weather from './Weather.astro';
+import ContactForm from './ContactForm.astro';
+import MapEmbed from './MapEmbed.astro';
+import DocumentCard from './DocumentCard.astro';
+import type { PageItem } from '~/lib/types';
+import type { Site } from '~/lib/site';
+
+interface Props {
+  item: PageItem;
+  site: Site;
+  sizes?: string;
+}
+const { item, site, sizes } = Astro.props;
+---
+
+{item.type === 'card' && <Card {...item} />}
+{item.type === 'image' && <MediaImage image={item.image} shape={item.shape} sizes={sizes} />}
+{item.type === 'weather' && <Weather title={item.title} site={site} />}
+{item.type === 'contactForm' && <ContactForm title={item.title} />}
+{item.type === 'map' && <MapEmbed title={item.title} site={site} />}
+{item.type === 'document' && <DocumentCard {...item} />}

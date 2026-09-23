@@ -1,0 +1,75 @@
+---
+import type { ImageMetadata } from 'astro';
+import fontUrl from '@fontsource-variable/open-sans/files/open-sans-latin-wdth-normal.woff2?url';
+import Seo from '~/components/Seo.astro';
+import Header from '~/components/Header.astro';
+import Footer from '~/components/Footer.astro';
+import Breadcrumbs from '~/components/Breadcrumbs.astro';
+import { getSite } from '~/lib/site';
+import { breadcrumbList, graph, organization, website } from '~/lib/jsonld';
+import logo from '~/assets/brand/logo.png';
+import { getImage } from 'astro:assets';
+import '~/styles/global.css';
+
+interface Props {
+  title: string;
+  description: string;
+  image?: { src: ImageMetadata; alt: string };
+  noindex?: boolean;
+  breadcrumb?: { label: string; href?: string }[];
+  /** Page-specific JSON-LD nodes, merged into the site graph. */
+  jsonLd?: Record<string, unknown>[];
+}
+
+const { title, description, image, noindex, breadcrumb = [], jsonLd = [] } = Astro.props;
+const site = await getSite();
+const origin = Astro.site!.origin;
+const logoImg = await getImage({ src: logo, width: 512, format: 'png' });
+const nodes = [
+  organization(site, origin, new URL(logoImg.src, origin).href),
+  website(site, origin),
+  ...(breadcrumb.length ? [breadcrumbList(breadcrumb, origin)] : []),
+  ...jsonLd,
+];
+---
+
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#001a3c" />
+    <link rel="preload" href={fontUrl} as="font" type="font/woff2" crossorigin />
+    <style
+      is:inline
+      set:html={`@font-face{font-family:'Open Sans';font-style:normal;font-display:swap;font-weight:300 800;font-stretch:75% 100%;src:url(${fontUrl}) format('woff2-variations');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}`}
+    ></style>
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="icon" href="/icon-192.png" type="image/png" sizes="192x192" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <Seo
+      title={title}
+      description={description}
+      siteName={site.name}
+      image={image ?? site.defaultOgImage}
+      noindex={noindex}
+      jsonLd={graph(nodes)}
+    />
+    <slot name="head" />
+  </head>
+  <body class="flex min-h-screen flex-col bg-navy">
+    <a
+      href="#contenu"
+      class="sr-only z-50 rounded bg-gold px-4 py-2 font-bold text-navy focus:not-sr-only focus:fixed focus:top-2 focus:left-2"
+    >
+      Aller au contenu
+    </a>
+    <Header site={site} />
+    <main id="contenu" class="flex-1 pb-16">
+      {breadcrumb.length > 0 && <Breadcrumbs items={breadcrumb} />}
+      <slot />
+    </main>
+    <Footer site={site} />
+  </body>
+</html>

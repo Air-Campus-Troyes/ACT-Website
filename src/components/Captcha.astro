@@ -1,0 +1,47 @@
+---
+// Anti-spam widget. Swapping Turnstile for hCaptcha / Friendly Captcha means changing this file
+// and src/server/captcha.ts only.
+import { PUBLIC_TURNSTILE_SITE_KEY } from 'astro:env/client';
+---
+
+<div class="min-h-[65px]" data-captcha data-sitekey={PUBLIC_TURNSTILE_SITE_KEY}></div>
+
+<script>
+  type Turnstile = {
+    render: (el: HTMLElement, opts: Record<string, unknown>) => string;
+    reset: (id?: string) => void;
+  };
+  const w = window as unknown as { turnstile?: Turnstile; onTurnstileLoad?: () => void };
+
+  // The widget script is only fetched once the form is close to the viewport,
+  // so it never costs anything on first paint.
+  const containers = [...document.querySelectorAll<HTMLElement>('[data-captcha]')];
+  const load = () => {
+    if (document.querySelector('script[data-turnstile]')) return;
+    w.onTurnstileLoad = () =>
+      containers.forEach((el) =>
+        w.turnstile?.render(el, {
+          sitekey: el.dataset.sitekey,
+          language: 'fr',
+          'response-field-name': 'captcha',
+        }),
+      );
+    const s = document.createElement('script');
+    s.src =
+      'https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onTurnstileLoad&render=explicit';
+    s.async = true;
+    s.dataset.turnstile = '';
+    document.head.append(s);
+  };
+  const io = new IntersectionObserver(
+    (entries) => {
+      if (entries.some((e) => e.isIntersecting)) {
+        io.disconnect();
+        load();
+      }
+    },
+    { rootMargin: '400px' },
+  );
+  containers.forEach((el) => io.observe(el));
+  document.addEventListener('captcha:reset', () => w.turnstile?.reset());
+</script>

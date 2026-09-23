@@ -1,0 +1,9 @@
+# Code changes need a review from the web team; content-only changes (src/content,
+# src/assets/uploads, public/documents) have no owner, so they can be merged once CI is green.
+
+*                      @Air-Campus-Troyes/dev
+
+# Content edited by the club (Decap CMS or GitHub web editor): no mandatory code review.
+/src/content/
+/src/assets/uploads/
+/public/documents/

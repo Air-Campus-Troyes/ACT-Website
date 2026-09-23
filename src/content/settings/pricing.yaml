@@ -1,0 +1,93 @@
+# Tarifs affichés sur la page « Nos tarifs ». Les prix des vols découverte sont repris
+# automatiquement dans les données Google (offers).
+intro:
+  title: 'Forfait élèves et pilotes : forfait annuel de 2 490,00 €'
+  body: |
+    Le forfait pour l’année 2026/2027 est fixé à **2 490,00 €**. Le forfait permet de bénéficier d’un tarif préférentiel, avec une économie de 10,00 € sur le prix d’une heure de vol.
+
+    Le montant du forfait est converti en heures de vol selon le tarif horaire de l’appareil utilisé. Chaque heure effectuée vient donc diminuer le crédit du forfait.
+
+    <u>Exemples</u> :
+
+    - Un pilote qui vole uniquement sur l’Océanair TC160 (165 €/h) dispose d’environ 15 heures de vol.
+    - Un pilote qui vole uniquement sur le Piper PA28-180 (175 €/h) dispose d’environ 14 h 15.
+
+    ### Au-delà du forfait
+
+    Une fois le forfait entièrement consommé, le pilote peut continuer à voler en bénéficiant d’un tarif préférentiel.
+
+    <u>À titre d’exemple</u> :
+
+    - Océanair TC160 : 155 €/h (au lieu de 165 €/h)
+    - Piper PA28-180 : 165 €/h (au lieu de 175 €/h)
+
+    ### Forfait non consommé
+
+    Le forfait annuel constitue un engagement. En conséquence, les heures de vol non utilisées au 31 décembre sont reportées à l’année suivante, la première année lorsque les pilotes reprennent un forfait.
+
+    <u>Des exceptions sont toutefois prévues</u> :
+
+    - en cas d’empêchement majeur (maladie, accident, déplacement professionnel de longue durée, etc.) ;
+    - pour les élèves pilotes, dont les heures non consommées sont automatiquement reportées et ajoutées au forfait de l’année suivante.
+
+    ### Pilotes sans forfait
+
+    Les pilotes qui choisissent de ne pas souscrire au forfait annuel peuvent naturellement voler, mais les heures sont alors facturées au tarif hors forfait.
+
+    <u>Par exemple</u> :
+
+    - Océanair TC160 : 197 €/h (au lieu de 165 €/h avec forfait).
+
+    Les tarifs des autres appareils sont consultables dans la grille tarifaire ci-dessous.
+
+    ### Modalités de paiement
+
+    Le forfait annuel peut être réglé en **une ou plusieurs échéances**.
+
+    **Les tarifs pourront être révisés en fonction de l’évolution du coût du carburant.**
+tableTitle: 'Air Campus Troyes : tarifs 2026'
+tables:
+  - title: Tarifs cotisations
+    columns: []
+    rows:
+      - label: Cotisation annuelle
+        values: ['180,00 €']
+      - label: Cotisation à partir du 1er juillet
+        values: ['90,00 €']
+  - title: Tarif forfait annuel
+    columns: []
+    rows:
+      - label: Forfait annuel pilotes & élèves
+        values: ['2 490,00 €']
+  - title: Tarifs horaires des appareils
+    columns: [Appareils, Avec forfait, Au-delà du forfait, Sans forfait]
+    rows:
+      - label: Océanair TC160
+        values: ['165,00 €/h', '155,00 €/h', '197,00 €/h']
+      - label: Piper PA28-180
+        values: ['175,00 €/h', '165,00 €/h', '207,00 €/h']
+  - title: Tarifs vols découverte & initiation
+    columns: []
+    rows:
+      - label: Vol découverte – 20 min
+        values: ['100,00 €']
+      - label: Vol découverte – 30 min
+        values: ['120,00 €']
+      - label: Vol d’initiation – 30 min
+        values: ['130,00 €']
+legend:
+  title: Légende
+  body: |
+    **Avec forfait :** tarif appliqué dans le cadre du forfait annuel de 2 490,00 €.<br>
+    **Au-delà du forfait :** tarif préférentiel appliqué une fois le forfait entièrement consommé.<br>
+    **Sans forfait :** tarif appliqué aux pilotes ne bénéficiant pas du forfait annuel.
+offers:
+  - name: Vol découverte 20 minutes (jusqu’à 3 passagers)
+    price: 100
+    url: /bapteme-de-lair/
+  - name: Vol découverte 30 minutes (jusqu’à 3 passagers)
+    price: 120
+    url: /bapteme-de-lair/
+  - name: Vol d’initiation au pilotage 30 minutes
+    price: 130
+    url: /vol-d-initiation/

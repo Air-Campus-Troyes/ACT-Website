@@ -1,0 +1,96 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import Hero from '~/components/blocks/Hero.astro';
+import Row from '~/components/blocks/Row.astro';
+import Item from '~/components/blocks/Item.astro';
+import Pricing from '~/components/blocks/Pricing.astro';
+import Aircraft from '~/components/blocks/Aircraft.astro';
+import Faq from '~/components/blocks/Faq.astro';
+import SiteMap from '~/components/blocks/SiteMap.astro';
+import { getSite, pagePath } from '~/lib/site';
+import { faqPage, offerCatalog } from '~/lib/jsonld';
+import { markdownToText } from '~/lib/markdown';
+
+export const getStaticPaths = (async () => {
+  const pages = await getCollection('pages');
+  return pages.map((page) => ({
+    params: { slug: page.data.path || undefined },
+    props: { page },
+  }));
+}) satisfies GetStaticPaths;
+
+const { page } = Astro.props;
+const { data } = page;
+const site = await getSite();
+const { Content } = await render(page);
+const has = (type: string) => data.sections.some((s) => s.type === type);
+
+// Page-specific structured data.
+const jsonLd: Record<string, unknown>[] = [];
+const faqEntries = has('faq')
+  ? (await getCollection('faq')).sort((a, b) => a.data.order - b.data.order)
+  : [];
+if (faqEntries.length) {
+  jsonLd.push(
+    faqPage(
+      faqEntries.map((e) => ({ question: e.data.question, answer: markdownToText(e.body ?? '') })),
+    ),
+  );
+}
+if (has('pricing')) {
+  const pricing = (await getCollection('pricing'))[0]!.data;
+  if (pricing.offers.length) jsonLd.push(offerCatalog(pricing.offers, Astro.site!.origin));
+}
+
+const breadcrumb = data.path
+  ? [
+      { label: 'Accueil', href: '/' },
+      ...data.breadcrumb,
+      { label: data.title, href: pagePath(data.path) },
+    ]
+  : [];
+const hasHero = data.sections[0]?.type === 'hero';
+---
+
+<BaseLayout
+  title={data.seo.title}
+  description={data.seo.description}
+  image={data.ogImage}
+  noindex={data.seo.noindex}
+  breadcrumb={breadcrumb}
+  jsonLd={jsonLd}
+>
+  {!hasHero && (
+    <div class="container-page pt-10 pb-10 sm:pt-16 sm:pb-14">
+      <h1 class="text-4xl text-cream sm:text-5xl">{data.title}</h1>
+    </div>
+  )}
+  {data.sections.map((section, i) => {
+    if (section.type === 'hero') return <Hero {...section} />;
+    return (
+      <div class:list={['container-page mb-12', i === 1 && hasHero && 'pt-12 sm:pt-16']}>
+        {section.type === 'row' && <Row {...section} site={site} />}
+        {section.type === 'full' && (
+          <div class="flex flex-col gap-8 lg:gap-12">
+            {section.items.map((item) => (
+              <Item item={item} site={site} sizes="(min-width: 1152px) 1100px, 100vw" />
+            ))}
+          </div>
+        )}
+        {section.type === 'pricing' && <Pricing />}
+        {section.type === 'aircraft' && <Aircraft />}
+        {section.type === 'faq' && <Faq entries={faqEntries} />}
+        {section.type === 'sitemap' && <SiteMap />}
+        {section.type === 'markdown' && (
+          <div class="card text-left">
+            <div class="richtext">
+              <Content />
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  })}
+</BaseLayout>

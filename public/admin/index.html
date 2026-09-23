@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Administration du contenu – Air Campus Troyes</title>
+    <script>
+      window.CMS_MANUAL_INIT = true;
+    </script>
+    <script src="https://unpkg.com/decap-cms@3.16.3/dist/decap-cms.js"></script>
+  </head>
+  <body>
+    <script>
+      // config.yml holds the content model; the OAuth server is always the site serving /admin
+      // (production or staging), so the same file works in every environment.
+      CMS.init({ config: { backend: { base_url: window.location.origin } } });
+    </script>
+  </body>
+</html>

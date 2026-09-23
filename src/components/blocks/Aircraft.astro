@@ -1,0 +1,21 @@
+---
+import { getCollection } from 'astro:content';
+import MediaImage from './MediaImage.astro';
+
+const aircraft = (await getCollection('aircraft')).sort((a, b) => a.data.order - b.data.order);
+---
+
+<div class="flex flex-col gap-14">
+  {aircraft.map((a) => (
+    <article class="flex flex-col gap-4 text-cream" id={a.id}>
+      <div>
+        <h2 class="text-2xl">
+          {a.data.name}
+          {a.data.registration && <span class="sr-only">({a.data.registration})</span>}
+        </h2>
+        <p class="mt-2">{a.data.description}</p>
+      </div>
+      <MediaImage image={a.data.image} sizes="(min-width: 1152px) 1100px, 100vw" />
+    </article>
+  ))}
+</div>

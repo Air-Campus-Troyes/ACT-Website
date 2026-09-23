@@ -1,0 +1,36 @@
+---
+import Item from './Item.astro';
+import type { PageItem } from '~/lib/types';
+import type { Site } from '~/lib/site';
+
+interface Props {
+  ratio: '1-1' | '5-7' | '7-5' | '1-2' | '2-1';
+  left: PageItem[];
+  right: PageItem[];
+  site: Site;
+}
+const { ratio, left, right, site } = Astro.props;
+const cols = {
+  '1-1': 'lg:grid-cols-2',
+  '5-7': 'lg:grid-cols-[5fr_7fr]',
+  '7-5': 'lg:grid-cols-[7fr_5fr]',
+  '1-2': 'lg:grid-cols-[1fr_2fr]',
+  '2-1': 'lg:grid-cols-[2fr_1fr]',
+}[ratio];
+const [l, r] = ratio.split('-').map(Number);
+const sizes = (n: number) =>
+  `(min-width: 1152px) ${Math.round((1100 * n) / (l + r))}px, (min-width: 1024px) ${Math.round((100 * n) / (l + r))}vw, 100vw`;
+---
+
+<div class:list={['grid grid-cols-1 gap-8 lg:gap-12', cols]}>
+  {[
+    { items: left, n: l },
+    { items: right, n: r },
+  ].map((col) => (
+    <div class="flex flex-col gap-8 lg:gap-12">
+      {col.items.map((item) => (
+        <Item item={item} site={site} sizes={sizes(col.n)} />
+      ))}
+    </div>
+  ))}
+</div>

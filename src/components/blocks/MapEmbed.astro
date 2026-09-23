@@ -1,0 +1,43 @@
+---
+import type { Site } from '~/lib/site';
+
+interface Props {
+  title: string;
+  site: Site;
+}
+const { title, site } = Astro.props;
+const { lat, lon } = site.geo;
+const d = 0.012;
+// OpenStreetMap embed: no cookies, no API key, no consent banner needed.
+const src = `https://www.openstreetmap.org/export/embed.html?bbox=${lon - d * 1.6},${lat - d},${lon + d * 1.6},${lat + d}&layer=mapnik&marker=${lat},${lon}`;
+const links = [
+  {
+    label: 'Itinéraire Google Maps',
+    href: `https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}`,
+  },
+  { label: 'Itinéraire Waze', href: `https://waze.com/ul?ll=${lat},${lon}&navigate=yes` },
+  {
+    label: 'Voir sur OpenStreetMap',
+    href: `https://www.openstreetmap.org/?mlat=${lat}&mlon=${lon}#map=15/${lat}/${lon}`,
+  },
+];
+---
+
+<div class="overflow-hidden rounded-(--radius-card) bg-cream">
+  <iframe
+    src={src}
+    title={title}
+    loading="lazy"
+    class="block h-96 w-full border-0 lg:h-[28rem]"
+    referrerpolicy="no-referrer"
+  ></iframe>
+  <ul class="flex flex-wrap justify-center gap-x-6 gap-y-2 px-6 py-4 text-sm text-navy">
+    {links.map((l) => (
+      <li>
+        <a href={l.href} class="underline hover:no-underline" rel="noopener" target="_blank">
+          {l.label}
+        </a>
+      </li>
+    ))}
+  </ul>
+</div>

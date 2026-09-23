@@ -1,0 +1,28 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  // Production worker. `CLOUDFLARE_ENV=staging npm run build` targets env.staging instead.
+  "name": "website",
+  "compatibility_date": "2026-09-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "observability": { "enabled": true },
+  // Free <name>.<account>.workers.dev URL. Once the custom domain is live, set
+  // "workers_dev": false here to avoid a duplicate site. No per-version preview URLs.
+  "workers_dev": true,
+  "preview_urls": false,
+  "vars": {},
+  "routes": [
+    // Uncomment once the aircampustroyes.fr zone is on Cloudflare.
+    // { "pattern": "www.aircampustroyes.fr", "custom_domain": true }
+  ],
+  "env": {
+    "staging": {
+      "name": "website-staging",
+      "workers_dev": true,
+      "preview_urls": false,
+      "vars": {},
+      "routes": [
+        // { "pattern": "staging.aircampustroyes.fr", "custom_domain": true }
+      ],
+    },
+  },
+}

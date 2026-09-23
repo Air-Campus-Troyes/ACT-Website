@@ -1,0 +1,405 @@
+# Decap CMS — interface d'édition du contenu (https://decapcms.org/docs/configuration-options/).
+# Ce fichier doit rester synchronisé avec src/content.config.ts (le schéma validé au build).
+
+backend:
+  name: github
+  repo: TODO-ORG/ACT-Website # ← à remplacer par <organisation>/<dépôt> GitHub
+  branch: main
+  auth_endpoint: api/decap/auth/
+  # base_url est injecté par public/admin/index.html (origine du site courant).
+  commit_messages:
+    create: 'contenu : création de {{collection}} « {{slug}} »'
+    update: 'contenu : mise à jour de {{collection}} « {{slug}} »'
+    delete: 'contenu : suppression de {{collection}} « {{slug}} »'
+    uploadMedia: 'contenu : ajout du fichier {{path}}'
+    deleteMedia: 'contenu : suppression du fichier {{path}}'
+
+# Chaque enregistrement crée une branche + une Pull Request ; une fois fusionnée, la
+# modification est visible sur le site de test (staging) avant validation en production.
+publish_mode: editorial_workflow
+# `npm run cms` puis http://localhost:4321/admin/ : édition locale sans GitHub.
+local_backend: true
+
+locale: fr
+site_url: https://www.aircampustroyes.fr
+logo_url: /apple-touch-icon.png
+media_folder: src/assets/uploads
+public_folder: ../../assets/uploads
+
+# ---------------------------------------------------------------------------
+# Briques réutilisables (ancres YAML)
+# ---------------------------------------------------------------------------
+x-image: &image
+  label: Image
+  name: image
+  widget: object
+  fields:
+    - { label: Fichier, name: src, widget: image, choose_url: false }
+    - label: Texte alternatif
+      name: alt
+      widget: string
+      hint: Décrivez l’image pour les personnes malvoyantes et pour Google (obligatoire).
+
+x-buttons: &buttons
+  label: Boutons
+  name: buttons
+  widget: list
+  required: false
+  summary: '{{fields.label}} → {{fields.href}}'
+  fields:
+    - { label: Texte, name: label, widget: string }
+    - { label: Lien, name: href, widget: string, hint: 'Ex. /contact/ ou https://…' }
+    - label: Couleur
+      name: variant
+      widget: select
+      default: gold
+      options:
+        - { label: Jaune, value: gold }
+        - { label: Bleu marine, value: navy }
+        - { label: Crème, value: light }
+
+x-items: &items
+  widget: list
+  required: false
+  types:
+    - label: Carte de texte
+      name: card
+      summary: '{{fields.title}}'
+      fields:
+        - { label: Titre, name: title, widget: string, required: false }
+        - {
+            label: Texte,
+            name: body,
+            widget: markdown,
+            required: false,
+            buttons: [bold, italic, link, bulleted-list, numbered-list, heading-three],
+          }
+        - label: Alignement
+          name: align
+          widget: select
+          default: center
+          options: [{ label: Centré, value: center }, { label: À gauche, value: left }]
+        - *buttons
+    - label: Photo
+      name: image
+      fields:
+        - *image
+        - label: Format
+          name: shape
+          widget: select
+          default: auto
+          options:
+            - { label: Automatique, value: auto }
+            - { label: Paysage, value: landscape }
+            - { label: Portrait, value: portrait }
+            - { label: Carré, value: square }
+    - label: Météo
+      name: weather
+      fields: [{ label: Titre, name: title, widget: string, default: Météo }]
+    - label: Formulaire de contact
+      name: contactForm
+      fields: [{ label: Titre, name: title, widget: string, default: Envoyez-nous un message }]
+    - label: Carte (plan)
+      name: map
+      fields: [{ label: Titre (lecteurs d’écran), name: title, widget: string, default: Carte }]
+    - label: Document PDF
+      name: document
+      fields:
+        - { label: Titre, name: title, widget: string }
+        - { label: Texte, name: body, widget: markdown, required: false }
+        - {
+            label: Fichier,
+            name: file,
+            widget: file,
+            media_folder: /public/documents,
+            public_folder: /documents,
+          }
+        - { label: Texte du lien, name: label, widget: string }
+
+collections:
+  # -------------------------------------------------------------------------
+  - name: pages
+    label: Pages
+    label_singular: Page
+    folder: src/content/pages
+    extension: md
+    format: frontmatter
+    create: true
+    slug: '{{slug}}'
+    identifier_field: title
+    summary: '{{title}} — /{{path}}'
+    sortable_fields: [title, path]
+    fields:
+      - { label: Titre de la page (H1), name: title, widget: string }
+      - label: Adresse (URL)
+        name: path
+        widget: string
+        required: false
+        pattern:
+          [
+            '^([a-z0-9-]+(/[a-z0-9-]+)*)?$',
+            'Minuscules, chiffres et tirets uniquement, sans / au début ni à la fin',
+          ]
+        hint: Ex. « nos-tarifs » ou « apprendre-a-piloter/vol-nuit ». Ne la modifiez pas une fois la page publiée (référencement Google).
+      - label: Référencement (Google)
+        name: seo
+        widget: object
+        collapsed: true
+        fields:
+          - label: Titre Google
+            name: title
+            widget: string
+            pattern: ['^.{10,60}$', 'Entre 10 et 60 caractères']
+            hint: Titre affiché dans les résultats Google, 60 caractères maximum. Incluez un mot-clé et « Troyes ».
+          - label: Description Google
+            name: description
+            widget: text
+            pattern: ['^[\s\S]{50,170}$', 'Entre 50 et 170 caractères']
+            hint: Résumé affiché sous le titre dans Google, entre 50 et 170 caractères.
+          - { label: Masquer de Google, name: noindex, widget: boolean, default: false }
+      - label: Fil d’Ariane (rubriques parentes)
+        name: breadcrumb
+        widget: list
+        required: false
+        summary: '{{fields.label}}'
+        hint: « Accueil » et la page elle-même sont ajoutés automatiquement.
+        fields:
+          - { label: Libellé, name: label, widget: string }
+          - { label: Lien, name: href, widget: string, required: false }
+      - label: Image de partage (réseaux sociaux)
+        name: ogImage
+        widget: object
+        required: false
+        collapsed: true
+        fields:
+          - { label: Fichier, name: src, widget: image, required: false, choose_url: false }
+          - { label: Texte alternatif, name: alt, widget: string, required: false }
+      - label: Sections
+        name: sections
+        widget: list
+        types:
+          - label: Bandeau photo (accueil)
+            name: hero
+            fields:
+              - { label: Titre, name: title, widget: string }
+              - *image
+          - label: Deux colonnes
+            name: row
+            summary: 'Deux colonnes ({{fields.ratio}})'
+            fields:
+              - label: Largeur des colonnes
+                name: ratio
+                widget: select
+                default: 1-1
+                options:
+                  - { label: Égales, value: 1-1 }
+                  - { label: Gauche plus étroite, value: 5-7 }
+                  - { label: Gauche plus large, value: 7-5 }
+                  - { label: Gauche 1/3, value: 1-2 }
+                  - { label: Gauche 2/3, value: 2-1 }
+              - { <<: *items, label: Colonne de gauche, name: left }
+              - { <<: *items, label: Colonne de droite, name: right }
+          - label: Pleine largeur
+            name: full
+            fields:
+              - { <<: *items, label: Éléments, name: items }
+          - { label: Grille tarifaire, name: pricing, fields: [] }
+          - { label: Liste des avions, name: aircraft, fields: [] }
+          - { label: Foire aux questions, name: faq, fields: [] }
+          - { label: Plan du site, name: sitemap, fields: [] }
+          - { label: Texte libre (corps de la page), name: markdown, fields: [] }
+      - label: Texte libre
+        name: body
+        widget: markdown
+        required: false
+        hint: Affiché uniquement si la page contient une section « Texte libre » (ex. mentions légales).
+
+  # -------------------------------------------------------------------------
+  - name: faq
+    label: FAQ
+    label_singular: Question
+    folder: src/content/faq
+    extension: md
+    format: frontmatter
+    create: true
+    slug: '{{slug}}'
+    identifier_field: question
+    summary: '{{order}} — {{question}}'
+    sortable_fields: [order, question]
+    fields:
+      - { label: Question, name: question, widget: string }
+      - {
+          label: Ordre d’affichage,
+          name: order,
+          widget: number,
+          value_type: int,
+          default: 100,
+          hint: Les plus petits nombres s’affichent en premier.,
+        }
+      - {
+          label: Réponse,
+          name: body,
+          widget: markdown,
+          buttons: [bold, italic, link, bulleted-list],
+        }
+
+  # -------------------------------------------------------------------------
+  - name: aircraft
+    label: Avions
+    label_singular: Avion
+    folder: src/content/aircraft
+    extension: md
+    format: frontmatter
+    create: true
+    slug: '{{slug}}'
+    identifier_field: name
+    fields:
+      - { label: Nom, name: name, widget: string }
+      - { label: Immatriculation, name: registration, widget: string, required: false }
+      - { label: Description, name: description, widget: text }
+      - *image
+      - { label: Ordre d’affichage, name: order, widget: number, value_type: int, default: 100 }
+
+  # -------------------------------------------------------------------------
+  - name: settings
+    label: Réglages
+    files:
+      - name: pricing
+        label: Tarifs
+        file: src/content/settings/pricing.yaml
+        format: yaml
+        fields:
+          - label: Introduction
+            name: intro
+            widget: object
+            fields:
+              - { label: Titre, name: title, widget: string }
+              - { label: Texte, name: body, widget: markdown }
+          - { label: Titre de la grille, name: tableTitle, widget: string }
+          - label: Tableaux
+            name: tables
+            widget: list
+            summary: '{{fields.title}}'
+            fields:
+              - { label: Titre, name: title, widget: string }
+              - {
+                  label: En-têtes de colonnes (facultatif),
+                  name: columns,
+                  widget: list,
+                  required: false,
+                  field: { label: Colonne, name: column, widget: string },
+                }
+              - label: Lignes
+                name: rows
+                widget: list
+                summary: '{{fields.label}}'
+                fields:
+                  - { label: Libellé, name: label, widget: string }
+                  - {
+                      label: Valeurs,
+                      name: values,
+                      widget: list,
+                      field: { label: Valeur, name: value, widget: string },
+                    }
+          - label: Légende
+            name: legend
+            widget: object
+            required: false
+            fields:
+              - { label: Titre, name: title, widget: string }
+              - { label: Texte, name: body, widget: markdown }
+          - label: Offres (données Google)
+            name: offers
+            widget: list
+            required: false
+            hint: Prix repris dans les données structurées pour Google. Mettez-les à jour avec la grille.
+            summary: '{{fields.name}} — {{fields.price}} €'
+            fields:
+              - { label: Nom, name: name, widget: string }
+              - { label: Prix (€), name: price, widget: number, value_type: float }
+              - { label: Page, name: url, widget: string, required: false }
+
+      - name: site
+        label: Informations du club
+        file: src/content/settings/site.yaml
+        format: yaml
+        fields:
+          - { label: Nom, name: name, widget: string }
+          - { label: Nom légal, name: legalName, widget: string }
+          - { label: Présentation courte (Google), name: tagline, widget: text }
+          - { label: Date de création (AAAA-MM-JJ), name: foundingDate, widget: string }
+          - {
+              label: Téléphone (format international),
+              name: phone,
+              widget: string,
+              hint: 'Ex. +33613712011',
+            }
+          - { label: Téléphone (affichage), name: phoneDisplay, widget: string }
+          - { label: Email public, name: email, widget: string, required: false }
+          - label: Adresse
+            name: address
+            widget: object
+            fields:
+              - { label: Ligne 1, name: line1, widget: string }
+              - { label: Ligne 2, name: line2, widget: string }
+              - { label: Code postal, name: postalCode, widget: string }
+              - { label: Ville, name: city, widget: string }
+              - { label: Pays (code), name: country, widget: string, default: FR }
+          - label: Coordonnées GPS
+            name: geo
+            widget: object
+            fields:
+              - { label: Latitude, name: lat, widget: number, value_type: float }
+              - { label: Longitude, name: lon, widget: number, value_type: float }
+          - { label: Où se garer, name: parking, widget: text }
+          - {
+              label: Horaires (format schema.org,
+              ex. « Sa-Su 09:00-18:00 »),
+              name: openingHours,
+              widget: list,
+              required: false,
+            }
+          - label: Réseaux sociaux
+            name: social
+            widget: list
+            required: false
+            fields:
+              - {
+                  label: Réseau,
+                  name: network,
+                  widget: select,
+                  options: [facebook, instagram, youtube],
+                }
+              - { label: Adresse, name: url, widget: string }
+          - label: Menu principal
+            name: nav
+            widget: list
+            summary: '{{fields.label}}'
+            fields:
+              - { label: Libellé, name: label, widget: string }
+              - { label: Lien, name: href, widget: string, required: false }
+              - label: Sous-menu
+                name: children
+                widget: list
+                required: false
+                fields:
+                  - { label: Libellé, name: label, widget: string }
+                  - { label: Lien, name: href, widget: string }
+          - label: Liens du pied de page
+            name: footerLinks
+            widget: list
+            fields:
+              - { label: Libellé, name: label, widget: string }
+              - { label: Lien, name: href, widget: string }
+          - label: Liens légaux
+            name: legalLinks
+            widget: list
+            fields:
+              - { label: Libellé, name: label, widget: string }
+              - { label: Lien, name: href, widget: string }
+          - label: Image de partage par défaut
+            name: defaultOgImage
+            widget: object
+            fields:
+              - { label: Fichier, name: src, widget: image, choose_url: false }
+              - { label: Texte alternatif, name: alt, widget: string }

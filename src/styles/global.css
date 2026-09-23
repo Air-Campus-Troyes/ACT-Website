@@ -1,0 +1,86 @@
+@import 'tailwindcss';
+@plugin '@tailwindcss/typography';
+
+/* Design tokens, taken from the Figma hi-fi frames (design/screens). */
+@theme {
+  --color-navy: #001a3c;
+  --color-navy-700: #0b2a55;
+  --color-gold: #fbc10d;
+  --color-gold-600: #e0a800;
+  --color-cream: #fffbec;
+  --color-cream-200: #fef4d0;
+  --color-ink: #001a3c;
+
+  --font-sans: 'Open Sans', ui-sans-serif, system-ui, sans-serif;
+  /* Headings use Open Sans at its condensed width (variable `wdth` axis). */
+  --font-display: 'Open Sans', 'Arial Narrow', ui-sans-serif, sans-serif;
+
+  --radius-card: 2.5rem;
+  --radius-media: 2.5rem;
+  --radius-button: 0.875rem;
+
+  --container-page: 72rem;
+}
+
+@layer base {
+  html {
+    @apply bg-navy font-sans text-ink;
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+
+  h1,
+  h2,
+  h3,
+  .font-display {
+    font-family: var(--font-display);
+    font-stretch: 75%;
+    font-weight: 700;
+    text-transform: uppercase;
+    line-height: 1.15;
+    letter-spacing: 0.005em;
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--color-gold);
+    outline-offset: 2px;
+  }
+}
+
+@layer components {
+  .container-page {
+    @apply mx-auto w-full max-w-(--container-page) px-4 sm:px-6 lg:px-8;
+  }
+
+  .card {
+    @apply rounded-(--radius-card) bg-cream px-6 py-8 text-center text-ink sm:px-10 sm:py-10;
+  }
+
+  /* Rich text coming from Markdown (card bodies, FAQ answers, legal pages). */
+  .richtext {
+    @apply prose max-w-none text-[0.95rem] leading-relaxed;
+    --tw-prose-body: var(--color-ink);
+    --tw-prose-headings: var(--color-ink);
+    --tw-prose-bold: var(--color-ink);
+    --tw-prose-links: var(--color-ink);
+    --tw-prose-bullets: var(--color-ink);
+    --tw-prose-counters: var(--color-ink);
+  }
+
+  .richtext :where(h2, h3, h4) {
+    font-family: var(--font-display);
+    font-stretch: 75%;
+    text-transform: uppercase;
+  }
+
+  /* In centred cards, lists stay left-aligned but centred as a block. */
+  .richtext-center :where(ul, ol) {
+    @apply mx-auto w-fit text-left;
+  }
+}

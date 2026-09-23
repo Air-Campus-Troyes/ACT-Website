@@ -1,0 +1,26 @@
+---
+import Card from './Card.astro';
+import Icon from '~/components/icons/Icon.astro';
+
+interface Props {
+  title: string;
+  body?: string;
+  file: string;
+  label: string;
+}
+const { title, body, file, label } = Astro.props;
+---
+
+<Card title={title} body={body}>
+  <p>
+    <a
+      href={file}
+      class="inline-flex items-center gap-2 font-semibold underline hover:no-underline"
+      target="_blank"
+      rel="noopener"
+    >
+      <Icon name="file" class="size-5" />
+      {label} <span class="sr-only">(PDF, nouvel onglet)</span>
+    </a>
+  </p>
+</Card>

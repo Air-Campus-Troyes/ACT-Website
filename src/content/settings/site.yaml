@@ -1,0 +1,66 @@
+# Informations générales du club, utilisées dans l'en-tête, le pied de page et pour Google.
+name: Air Campus Troyes
+legalName: Association Air Campus Troyes
+tagline: Aéroclub associatif à l’aéroport de Troyes-Barberey (LFQB) — vols découverte, vols d’initiation et école de pilotage (licence PPL).
+foundingDate: '2001-12-13'
+phone: '+33613712011'
+phoneDisplay: +33 6 13 71 20 11
+address:
+  line1: Aéroport de Troyes-Champagne
+  line2: RD 619
+  postalCode: '10600'
+  city: Barberey-Saint-Sulpice
+  country: FR
+geo:
+  lat: 48.327297
+  lon: 4.019069
+parking: Sur la route de l’aéroport, continuez tout droit et garez-vous sur le parking en terre devant notre algeco. Votre pilote vous y retrouvera !
+openingHours: []
+social:
+  - network: youtube
+    url: https://www.youtube.com/channel/UCaIKvKtCwZEUXwgukT83WpA
+nav:
+  - label: Accueil
+    href: /
+  - label: Prestations
+    children:
+      - label: Vol découverte
+        href: /bapteme-de-lair/
+      - label: Vol d’initiation
+        href: /vol-d-initiation/
+  - label: Apprendre à piloter
+    href: /apprendre-a-piloter/
+    children:
+      - label: Licence pilote privé (PPL)
+        href: /apprendre-a-piloter/licence-pilote-prive-ppl/
+      - label: Qualification vol de nuit
+        href: /apprendre-a-piloter/vol-nuit/
+  - label: Nos tarifs
+    href: /nos-tarifs/
+  - label: Nos avions
+    href: /nos-avions/
+  - label: Liens utiles
+    href: /liens-utiles/
+  - label: FAQ
+    href: /faq/
+  - label: Contact
+    href: /contact/
+footerLinks:
+  - label: FAQ
+    href: /faq/
+  - label: Plan d’accès
+    href: /plan-dacces/
+  - label: Contact
+    href: /contact/
+legalLinks:
+  - label: Plan du site
+    href: /plan-du-site/
+  - label: Mentions légales
+    href: /mentions-legales/
+  - label: Confidentialité
+    href: /politique-de-confidentialite/
+  - label: Connexion (membres)
+    href: https://online.aerogest.fr
+defaultOgImage:
+  src: ../../assets/uploads/oceanair-tc160-f-plbr.jpg
+  alt: L’Océanair TC160 F-PLBR du club sur le tarmac de l’aéroport de Troyes

@@ -1,0 +1,168 @@
+name: Deploy
+
+# main → staging (automatic) → production (manual approval on the `production` environment).
+#
+# Nothing is deployed from pull requests. Builds run without secrets; deploy jobs hold the
+# Cloudflare token and the Worker's runtime secrets but never check out or run project code:
+# they upload a build artifact with a pinned wrangler.
+# Setup and the switch to the real domain: docs/DEPLOYMENT.md.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  NODE_VERSION: 22
+  WRANGLER: wrangler@4.137.0
+
+jobs:
+  checks:
+    uses: ./.github/workflows/ci.yml
+
+  build:
+    name: Build ${{ matrix.target }}
+    needs: checks
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - target: staging
+            cloudflare_env: staging
+            site_env: staging
+            allow_indexing: 'false'
+            # Staging uses Turnstile's always-pass test key (no real widget needed there).
+            turnstile_site_key: ''
+          - target: production
+            cloudflare_env: ''
+            site_env: production
+            allow_indexing: ${{ vars.ALLOW_INDEXING || 'true' }}
+            turnstile_site_key: ${{ vars.PUBLIC_TURNSTILE_SITE_KEY }}
+    env:
+      # Canonical origin. Empty = https://www.aircampustroyes.fr (the default in astro.config.mjs).
+      SITE_URL: ${{ vars.CANONICAL_URL }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - run: npm ci
+      - name: Build
+        run: npm run build
+        env:
+          CLOUDFLARE_ENV: ${{ matrix.cloudflare_env }}
+          PUBLIC_SITE_ENV: ${{ matrix.site_env }}
+          PUBLIC_ALLOW_INDEXING: ${{ matrix.allow_indexing }}
+          PUBLIC_TURNSTILE_SITE_KEY: ${{ matrix.turnstile_site_key || '1x00000000000000000000AA' }}
+      - name: SEO lint
+        run: npm run seo:lint
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: dist-${{ matrix.target }}
+          path: dist/
+          retention-days: 14
+
+  staging:
+    name: Deploy staging
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: staging
+      url: ${{ vars.STAGING_URL }}
+    steps:
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: dist-staging
+          path: dist
+      - &write-secrets
+        name: Prepare Worker secrets
+        env:
+          BREVO_API_KEY: ${{ secrets.BREVO_API_KEY }}
+          TURNSTILE_SECRET_KEY: ${{ secrets.TURNSTILE_SECRET_KEY }}
+          CONTACT_TO_EMAIL: ${{ secrets.CONTACT_TO_EMAIL }}
+          CONTACT_FROM_EMAIL: ${{ secrets.CONTACT_FROM_EMAIL }}
+          GITHUB_OAUTH_CLIENT_ID: ${{ secrets.OAUTH_GITHUB_CLIENT_ID }}
+          GITHUB_OAUTH_CLIENT_SECRET: ${{ secrets.OAUTH_GITHUB_CLIENT_SECRET }}
+        # Only secrets that are set are sent; wrangler never deletes the ones left out.
+        run: |
+          node -e '
+            const keys = ["BREVO_API_KEY", "TURNSTILE_SECRET_KEY", "CONTACT_TO_EMAIL",
+              "CONTACT_FROM_EMAIL", "GITHUB_OAUTH_CLIENT_ID", "GITHUB_OAUTH_CLIENT_SECRET"];
+            const set = Object.fromEntries(keys.filter((k) => process.env[k]).map((k) => [k, process.env[k]]));
+            require("fs").writeFileSync(process.argv[1], JSON.stringify(set), { mode: 0o600 });
+            console.log("Secrets to sync:", Object.keys(set).join(", ") || "(none)");
+          ' "$RUNNER_TEMP/secrets.json"
+      - name: Deploy website-staging
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          npx --yes "$WRANGLER" deploy --config dist/server/wrangler.json --name website-staging \
+            --secrets-file "$RUNNER_TEMP/secrets.json" --message "${GITHUB_SHA::7}"
+          rm -f "$RUNNER_TEMP/secrets.json"
+
+  staging-e2e:
+    name: Smoke tests on staging
+    needs: staging
+    runs-on: ubuntu-latest
+    steps:
+      - &checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - &setup-node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npx playwright test
+        env:
+          BASE_URL: ${{ vars.STAGING_URL }}
+
+  production:
+    name: Deploy production
+    needs: staging-e2e
+    runs-on: ubuntu-latest
+    # Protected environment: a required reviewer approves in the GitHub UI, branch `main` only.
+    environment:
+      name: production
+      url: ${{ vars.PRODUCTION_URL }}
+    steps:
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: dist-production
+          path: dist
+      - *write-secrets
+      - name: Deploy website
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          npx --yes "$WRANGLER" deploy --config dist/server/wrangler.json --name website \
+            --secrets-file "$RUNNER_TEMP/secrets.json" --message "${GITHUB_SHA::7}"
+          rm -f "$RUNNER_TEMP/secrets.json"
+
+  production-e2e:
+    name: Smoke tests on production
+    needs: production
+    runs-on: ubuntu-latest
+    steps:
+      - *checkout
+      - *setup-node
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npx playwright test --project=desktop
+        env:
+          BASE_URL: ${{ vars.PRODUCTION_URL }}

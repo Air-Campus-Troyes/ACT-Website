@@ -1,0 +1,20 @@
+# Link checker config (https://lychee.cli.rs). Run in CI over the built HTML.
+max_concurrency = 8
+max_retries = 3
+timeout = 20
+accept = ["200..=299", "403", "429"]
+include_fragments = false
+
+exclude = [
+  # Government / CDN sites that block automated clients (return 503/403 to bots).
+  "^https://www\\.ecologie\\.gouv\\.fr",
+  # Map / navigation deep links and embeds.
+  "^https://www\\.openstreetmap\\.org/export/embed",
+  "^https://www\\.google\\.com/maps",
+  "^https://waze\\.com",
+  # tel: / mailto: links.
+  "^tel:",
+  "^mailto:",
+  # Canonical / OG URLs point at production, which may not be live yet.
+  "^https://www\\.aircampustroyes\\.fr",
+]

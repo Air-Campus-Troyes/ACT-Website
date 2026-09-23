@@ -1,0 +1,19 @@
+---
+import { getCollection } from 'astro:content';
+import { pagePath } from '~/lib/site';
+
+// Human-readable site map (the XML one for search engines is /sitemap-index.xml).
+const pages = (await getCollection('pages'))
+  .filter((p) => !p.data.seo.noindex)
+  .sort((a, b) => pagePath(a.data.path).localeCompare(pagePath(b.data.path)));
+---
+
+<div class="card text-left">
+  <ul class="richtext columns-1 sm:columns-2">
+    {pages.map((p) => (
+      <li>
+        <a href={pagePath(p.data.path)}>{p.data.title}</a>
+      </li>
+    ))}
+  </ul>
+</div>

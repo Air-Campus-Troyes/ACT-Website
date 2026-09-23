@@ -1,0 +1,393 @@
+---
+import type { Site } from '~/lib/site';
+
+interface Props {
+  title: string;
+  site: Site;
+}
+const { title, site } = Astro.props;
+const stat = 'rounded-2xl bg-white/10 px-3 py-2.5';
+const statLabel = 'text-[0.7rem] font-semibold tracking-wide text-white/75 uppercase';
+---
+
+<div class="card flex h-full flex-col items-center gap-4">
+  <h2 class="text-2xl sm:text-3xl">{title}</h2>
+
+  <!-- Icon sprite, referenced with <use href="#wx-…">. -->
+  <svg class="absolute size-0 overflow-hidden" aria-hidden="true" focusable="false">
+    <defs>
+      <g id="wx-sun" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+        <circle cx="12" cy="12" r="4.2"></circle>
+        <path d="M12 2.5v2M12 19.5v2M4.6 4.6l1.4 1.4M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4 6 18M18 6l1.4-1.4"></path>
+      </g>
+      <g id="wx-moon" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round">
+        <path d="M19.5 14.5A8 8 0 0 1 9.5 4.5a8 8 0 1 0 10 10Z"></path>
+      </g>
+      <path
+        id="wx-cloud-path"
+        d="M7 18.5h10a4 4 0 0 0 .6-7.95A5.5 5.5 0 0 0 7.1 9.1 4.7 4.7 0 0 0 7 18.5Z"
+      ></path>
+      <g id="wx-cloud" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round">
+        <use href="#wx-cloud-path"></use>
+      </g>
+      <g
+        id="wx-partly-day"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.6"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path d="M8.5 3v1.3M3.2 8.5h1.3M4.7 4.7l.9.9M12.3 4.7l-.9.9"></path>
+        <path d="M5.4 11.2a3.6 3.6 0 0 1 6.3-3.5"></path>
+        <path
+          d="M9 20h8.5a3.5 3.5 0 0 0 .5-6.96A4.8 4.8 0 0 0 9.1 11.8 4.1 4.1 0 0 0 9 20Z"
+          fill="currentColor"
+          fill-opacity=".15"
+        ></path>
+      </g>
+      <g
+        id="wx-partly-night"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.6"
+        stroke-linejoin="round"
+      >
+        <path d="M11.8 7.4A5 5 0 0 1 6 2.6a5 5 0 1 0 5.8 4.8Z"></path>
+        <path
+          d="M9 20h8.5a3.5 3.5 0 0 0 .5-6.96A4.8 4.8 0 0 0 9.1 11.8 4.1 4.1 0 0 0 9 20Z"
+          fill="currentColor"
+          fill-opacity=".15"
+        ></path>
+      </g>
+      <g id="wx-fog" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+        <path d="M4 9h16M3 13h18M5 17h14M8 21h8"></path>
+      </g>
+      <g
+        id="wx-drizzle"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.6"
+        stroke-linecap="round"
+      >
+        <use href="#wx-cloud-path" transform="translate(0 -3)"></use>
+        <path d="M9 18.5v1M13 18.5v1M17 18.5v1M11 21.5v.5M15 21.5v.5"></path>
+      </g>
+      <g id="wx-rain" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+        <use href="#wx-cloud-path" transform="translate(0 -3)"></use>
+        <path d="m9 18-1 3M13 18l-1 3M17 18l-1 3"></path>
+      </g>
+      <g id="wx-snow" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+        <use href="#wx-cloud-path" transform="translate(0 -3)"></use>
+        <path d="M9 18.5v3M7.7 20h2.6M15 18.5v3M13.7 20h2.6"></path>
+      </g>
+      <g
+        id="wx-storm"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.6"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <use href="#wx-cloud-path" transform="translate(0 -3)"></use>
+        <path d="m12.5 16-2 3.5h3l-2 3.5"></path>
+      </g>
+      <g id="wx-arrow" fill="currentColor">
+        <path d="M12 3 7 20l5-3.2 5 3.2Z"></path>
+      </g>
+    </defs>
+  </svg>
+
+  <div
+    class="wx @container w-full rounded-3xl p-5 text-left text-white shadow-inner"
+    data-weather
+    data-lat={site.geo.lat}
+    data-lon={site.geo.lon}
+    data-sky="cloudy"
+  >
+    <div class="flex items-baseline justify-between gap-2 text-sm whitespace-nowrap text-white/80">
+      <p class="font-semibold">Troyes · LFQB</p>
+      <p data-w="updated" class="tabular-nums"></p>
+    </div>
+
+    <div class="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
+      <div class="flex items-center gap-3">
+        <svg class="size-14 shrink-0" viewBox="0 0 24 24" aria-hidden="true">
+          <use data-w="icon" href="#wx-cloud"></use>
+        </svg>
+        <p class="text-6xl leading-none font-semibold whitespace-nowrap tabular-nums">
+          <span data-w="temp">–</span>
+          <span class="align-top text-3xl">°</span>
+        </p>
+      </div>
+      <div class="min-w-0 basis-full text-sm @xs:basis-auto">
+        <p class="font-semibold" data-w="desc">
+          Chargement…
+        </p>
+        <p class="text-white/80" data-w="feels"></p>
+        <p class="text-white/80 tabular-nums" data-w="minmax"></p>
+      </div>
+    </div>
+
+    <dl class="mt-5 grid grid-cols-2 gap-2 text-sm @md:grid-cols-4">
+      <div class={stat}>
+        <dt class={statLabel}>Vent</dt>
+        <dd class="mt-1 flex items-center gap-2">
+          <svg
+            class="size-5 shrink-0 transition-transform duration-700"
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+            data-w="arrow"
+          >
+            <use href="#wx-arrow"></use>
+          </svg>
+          <span class="font-semibold tabular-nums" data-w="wind">
+            –
+          </span>
+        </dd>
+        <dd class="text-xs text-white/75 tabular-nums" data-w="gusts"></dd>
+      </div>
+      <div class={stat}>
+        <dt class={statLabel}>Visibilité</dt>
+        <dd class="mt-1 font-semibold tabular-nums" data-w="visibility">
+          –
+        </dd>
+      </div>
+      <div class={stat}>
+        <dt class={statLabel}>Base nuages</dt>
+        <dd class="mt-1 font-semibold tabular-nums" data-w="cloudbase">
+          –
+        </dd>
+      </div>
+      <div class={stat}>
+        <dt class={statLabel}>QNH</dt>
+        <dd class="mt-1 font-semibold tabular-nums" data-w="qnh">
+          –
+        </dd>
+      </div>
+    </dl>
+
+    <ol class="mt-4 grid grid-cols-6 gap-1 text-center text-xs" aria-label="Prochaines heures">
+      {Array.from({ length: 6 }, () => (
+        <li class="rounded-xl py-2" data-hour>
+          <span class="block text-white/75 tabular-nums" data-h="time">
+            –
+          </span>
+          <svg class="mx-auto my-1 size-6" viewBox="0 0 24 24" aria-hidden="true">
+            <use data-h="icon" href="#wx-cloud" />
+          </svg>
+          <span class="block font-semibold tabular-nums" data-h="temp">
+            –
+          </span>
+        </li>
+      ))}
+    </ol>
+
+    <dl class="mt-4 flex flex-wrap justify-between gap-x-4 gap-y-1 border-t border-white/15 pt-3 text-xs">
+      <div class="flex gap-1">
+        <dt class="text-white/75">Lever</dt>
+        <dd class="font-semibold tabular-nums" data-w="sunrise">
+          –
+        </dd>
+      </div>
+      <div class="flex gap-1">
+        <dt class="text-white/75">Coucher</dt>
+        <dd class="font-semibold tabular-nums" data-w="sunset">
+          –
+        </dd>
+      </div>
+      <div class="flex gap-1">
+        <dt class="text-white/75">Nuit aéro</dt>
+        <dd class="font-semibold tabular-nums" data-w="night">
+          –
+        </dd>
+      </div>
+    </dl>
+
+    <p class="mt-3 text-[0.7rem] leading-snug text-white/75">
+      Indicatif, ne remplace pas un briefing officiel (
+      <a
+        class="underline hover:text-white"
+        href="https://aviation.meteo.fr/"
+        rel="noopener"
+        target="_blank"
+      >
+        Météo-France Aviation
+      </a>
+      ). Données{' '}
+      <a
+        class="underline hover:text-white"
+        href="https://open-meteo.com/"
+        rel="noopener"
+        target="_blank"
+      >
+        Open-Meteo
+      </a>
+      .
+    </p>
+  </div>
+</div>
+
+<style>
+  /* Background follows the sky; every tone keeps white text above 4.5:1 contrast. */
+  .wx {
+    --wx-a: #3b4a5e;
+    --wx-b: #56657a;
+    background-image: linear-gradient(135deg, var(--wx-a), var(--wx-b));
+  }
+  .wx[data-sky='clear'] {
+    --wx-a: #154a93;
+    --wx-b: #2566b0;
+  }
+  .wx[data-sky='partly'] {
+    --wx-a: #1b4580;
+    --wx-b: #3a628f;
+  }
+  .wx[data-sky='drizzle'],
+  .wx[data-sky='rain'],
+  .wx[data-sky='snow'] {
+    --wx-a: #2f3c4f;
+    --wx-b: #4a5a70;
+  }
+  .wx[data-sky='storm'] {
+    --wx-a: #211f33;
+    --wx-b: #3d3a57;
+  }
+  .wx[data-night] {
+    --wx-a: #06142e;
+    --wx-b: #1a2f5c;
+  }
+</style>
+
+<script>
+  import {
+    cloudBaseFt,
+    compass,
+    describe,
+    forecastUrl,
+    formatVisibility,
+    hhmm,
+    knotsToKmh,
+    type Sky,
+  } from '~/lib/weather';
+
+  const iconFor = (sky: Sky, isDay: boolean) => {
+    if (sky === 'clear') return isDay ? '#wx-sun' : '#wx-moon';
+    if (sky === 'partly') return isDay ? '#wx-partly-day' : '#wx-partly-night';
+    return `#wx-${sky}`;
+  };
+
+  type Forecast = {
+    current: {
+      time: string;
+      temperature_2m: number;
+      apparent_temperature: number;
+      dew_point_2m: number;
+      weather_code: number;
+      is_day: number;
+      visibility: number;
+      pressure_msl: number;
+      wind_speed_10m: number;
+      wind_direction_10m: number;
+      wind_gusts_10m: number;
+    };
+    hourly: {
+      time: string[];
+      temperature_2m: number[];
+      weather_code: number[];
+      is_day: number[];
+    };
+    daily: {
+      time: string[];
+      temperature_2m_max: number[];
+      temperature_2m_min: number[];
+      sunrise: string[];
+      sunset: string[];
+    };
+  };
+
+  async function render(el: HTMLElement) {
+    const set = (k: string, v: string) => {
+      const t = el.querySelector(`[data-w="${k}"]`);
+      if (t) t.textContent = v;
+    };
+    try {
+      const res = await fetch(forecastUrl(Number(el.dataset.lat), Number(el.dataset.lon)));
+      if (!res.ok) throw new Error(String(res.status));
+      const { current: c, hourly: h, daily: d } = (await res.json()) as Forecast;
+
+      const { label, sky } = describe(c.weather_code);
+      const isDay = c.is_day === 1;
+      el.dataset.sky = sky;
+      el.toggleAttribute('data-night', !isDay);
+      el.querySelector('[data-w="icon"]')?.setAttribute('href', iconFor(sky, isDay));
+
+      set('updated', `Mis à jour ${hhmm(c.time)}`);
+      set('temp', String(Math.round(c.temperature_2m)));
+      set('desc', label);
+      set('feels', `Ressenti ${Math.round(c.apparent_temperature)}°`);
+      set(
+        'minmax',
+        `Max ${Math.round(d.temperature_2m_max[0]!)}° · Min ${Math.round(d.temperature_2m_min[0]!)}°`,
+      );
+
+      const kt = Math.round(c.wind_speed_10m);
+      const dir = Math.round(c.wind_direction_10m);
+      set('wind', kt < 1 ? 'Calme' : `${kt} kt`);
+      set(
+        'gusts',
+        [
+          kt < 1 ? '' : `${String(dir).padStart(3, '0')}° ${compass(dir)}`,
+          `${knotsToKmh(c.wind_speed_10m)} km/h`,
+          `raf. ${Math.round(c.wind_gusts_10m)} kt`,
+        ]
+          .filter(Boolean)
+          .join(' · '),
+      );
+      // The arrow points where the wind blows to (it comes from `dir`).
+      const arrow = el.querySelector<SVGElement>('[data-w="arrow"]');
+      if (arrow) {
+        arrow.style.transform = `rotate(${dir + 180}deg)`;
+        arrow.style.visibility = kt < 1 ? 'hidden' : 'visible';
+      }
+
+      set('visibility', formatVisibility(c.visibility));
+      const base = cloudBaseFt(c.temperature_2m, c.dew_point_2m);
+      set('cloudbase', `≈ ${base.toLocaleString('fr-FR')} ft`);
+      set('qnh', `${Math.round(c.pressure_msl)} hPa`);
+
+      // Next six hours (the first hourly slot is the current hour).
+      el.querySelectorAll<HTMLElement>('[data-hour]').forEach((li, i) => {
+        const idx = i + 1;
+        if (h.time[idx] === undefined) return;
+        const hs = describe(h.weather_code[idx]!);
+        li.querySelector('[data-h="time"]')!.textContent = `${h.time[idx]!.slice(11, 13)}h`;
+        li.querySelector('[data-h="temp"]')!.textContent = `${Math.round(h.temperature_2m[idx]!)}°`;
+        li.querySelector('[data-h="icon"]')!.setAttribute(
+          'href',
+          iconFor(hs.sky, h.is_day[idx] === 1),
+        );
+        li.title = hs.label;
+      });
+
+      // Aeronautical night: sunset + 30 min until sunrise − 30 min.
+      set('sunrise', hhmm(d.sunrise[0]!));
+      set('sunset', hhmm(d.sunset[0]!));
+      set('night', `${hhmm(d.sunset[0]!, 30)} – ${hhmm(d.sunrise[1] ?? d.sunrise[0]!, -30)}`);
+    } catch {
+      set('desc', 'Météo indisponible pour le moment');
+    }
+  }
+
+  for (const el of document.querySelectorAll<HTMLElement>('[data-weather]')) {
+    render(el);
+    // Refresh when the visitor comes back to a tab left open for a while.
+    let last = Date.now();
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible' && Date.now() - last > 15 * 60_000) {
+        last = Date.now();
+        render(el);
+      }
+    });
+  }
+</script>

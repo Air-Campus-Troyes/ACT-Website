@@ -1,0 +1,132 @@
+---
+import Captcha from '~/components/Captcha.astro';
+
+interface Props {
+  title: string;
+}
+const { title } = Astro.props;
+const field =
+  'mt-1 block w-full rounded-2xl border border-navy/15 bg-white px-4 py-3 text-base text-navy focus:border-gold focus:outline-none';
+const label = 'font-display text-sm uppercase [font-stretch:75%]';
+---
+
+<div class="card text-left">
+  <h2 class="text-center text-2xl sm:text-3xl">{title}</h2>
+  <form
+    method="post"
+    action="/api/contact/"
+    class="mt-6 grid gap-4 sm:grid-cols-2"
+    data-contact-form
+    novalidate
+  >
+    <label class="block">
+      <span class={label}>
+        Nom <span aria-hidden="true">*</span>
+      </span>
+      <input class={field} name="lastName" autocomplete="family-name" required maxlength="100" />
+    </label>
+    <label class="block">
+      <span class={label}>
+        Prénom <span aria-hidden="true">*</span>
+      </span>
+      <input class={field} name="firstName" autocomplete="given-name" required maxlength="100" />
+    </label>
+    <label class="block sm:col-span-2">
+      <span class={label}>
+        Email <span aria-hidden="true">*</span>
+      </span>
+      <input
+        class={field}
+        type="email"
+        name="email"
+        autocomplete="email"
+        required
+        maxlength="200"
+      />
+    </label>
+    <label class="block sm:col-span-2">
+      <span class={label}>Téléphone</span>
+      <input class={field} type="tel" name="phone" autocomplete="tel" maxlength="30" />
+    </label>
+    <label class="block sm:col-span-2">
+      <span class={label}>
+        Message <span aria-hidden="true">*</span>
+      </span>
+      <textarea
+        class={field}
+        name="message"
+        rows="7"
+        required
+        minlength="10"
+        maxlength="5000"
+      ></textarea>
+    </label>
+    <!-- Honeypot: hidden from humans, bots fill it. -->
+    <div class="hidden" aria-hidden="true">
+      <label>
+        Ne pas remplir <input name="website" tabindex="-1" autocomplete="off" />
+      </label>
+    </div>
+    <p class="text-xs sm:col-span-2">
+      Les champs marqués d’un * sont obligatoires. Vos données servent uniquement à vous répondre.
+      <a href="/politique-de-confidentialite/" class="underline">
+        Politique de confidentialité
+      </a>
+    </p>
+    <div class="flex flex-col items-center gap-4 sm:col-span-2">
+      <Captcha />
+      <button
+        type="submit"
+        class="font-display min-h-11 min-w-48 rounded-(--radius-button) bg-gold px-6 py-2 text-lg text-navy uppercase [font-stretch:75%] hover:bg-gold-600 disabled:opacity-60"
+      >
+        Envoyer
+      </button>
+      <p role="status" aria-live="polite" class="text-center font-semibold" data-status></p>
+    </div>
+    <noscript>
+      <p class="text-center sm:col-span-2">
+        JavaScript est nécessaire pour la vérification anti-spam. Vous pouvez aussi nous appeler.
+      </p>
+    </noscript>
+  </form>
+</div>
+
+<script>
+  const messages: Record<string, string> = {
+    ok: 'Merci ! Votre message a bien été envoyé, nous vous répondrons rapidement.',
+    invalid: 'Merci de vérifier les champs obligatoires.',
+    captcha: 'La vérification anti-spam a échoué, merci de réessayer.',
+    error: 'Une erreur est survenue. Réessayez plus tard ou appelez-nous.',
+  };
+
+  for (const form of document.querySelectorAll<HTMLFormElement>('[data-contact-form]')) {
+    const status = form.querySelector<HTMLElement>('[data-status]')!;
+    const submit = form.querySelector<HTMLButtonElement>('button[type=submit]')!;
+
+    // The no-JS fallback redirects back here with ?envoi=<code>.
+    const code = new URLSearchParams(location.search).get('envoi');
+    if (code && messages[code]) status.textContent = messages[code];
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!form.reportValidity()) return;
+      submit.disabled = true;
+      status.textContent = 'Envoi en cours…';
+      try {
+        const res = await fetch(form.action, {
+          method: 'POST',
+          body: new FormData(form),
+          headers: { accept: 'application/json' },
+        });
+        const { result } = (await res.json()) as { result: string };
+        status.textContent = messages[result] ?? messages.error;
+        if (result === 'ok') form.reset();
+      } catch {
+        status.textContent = messages.error;
+      } finally {
+        submit.disabled = false;
+        document.dispatchEvent(new Event('captcha:reset'));
+      }
+    });
+  }
+</script>

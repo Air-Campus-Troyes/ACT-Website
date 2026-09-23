@@ -1,0 +1,32 @@
+---
+import Button from '~/components/Button.astro';
+import { renderMarkdown } from '~/lib/markdown';
+
+interface Props {
+  title?: string;
+  body?: string;
+  align?: 'center' | 'left';
+  buttons?: { label: string; href: string; variant: 'gold' | 'navy' | 'light' }[];
+}
+const { title, body, align = 'center', buttons = [] } = Astro.props;
+const html = renderMarkdown(body);
+---
+
+<div
+  class:list={['card flex h-full flex-col justify-center gap-4', align === 'left' && 'text-left']}
+>
+  {title && <h2 class="text-2xl sm:text-3xl">{title}</h2>}
+  {html && (
+    <div class:list={['richtext', align === 'center' && 'richtext-center']} set:html={html} />
+  )}
+  <slot />
+  {buttons.length > 0 && (
+    <div class:list={['mt-2 flex flex-wrap gap-4', align === 'center' && 'justify-center']}>
+      {buttons.map((b) => (
+        <Button href={b.href} variant={b.variant}>
+          {b.label}
+        </Button>
+      ))}
+    </div>
+  )}
+</div>
