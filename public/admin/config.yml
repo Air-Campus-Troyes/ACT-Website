@@ -3,7 +3,7 @@
 
 backend:
   name: github
-  repo: TODO-ORG/ACT-Website # ← à remplacer par <organisation>/<dépôt> GitHub
+  repo: Air-Campus-Troyes/ACT-Website
   branch: main
   auth_endpoint: api/decap/auth/
   # base_url est injecté par public/admin/index.html (origine du site courant).
