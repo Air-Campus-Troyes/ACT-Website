@@ -3,7 +3,8 @@ max_concurrency = 8
 max_retries = 3
 timeout = 20
 accept = ["200..=299", "403", "429"]
-include_fragments = false
+# Fragment (#anchor) checking is off by default; since v0.24 `include_fragments` takes a mode
+# string ("full"…), not a boolean.
 
 exclude = [
   # Government / CDN sites that block automated clients (return 503/403 to bots).
